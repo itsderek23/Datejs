@@ -736,7 +736,13 @@
                 this.day = this.days;
             }
             
-            return (expression) ? today.add(this) : today.set(this);
+            today.set(this);
+
+            if (expression) {
+              today.add(this);
+            }
+
+            return today;
         }
     };
 
