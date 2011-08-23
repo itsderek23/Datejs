@@ -701,10 +701,12 @@
         run: function() { },
         assert: function() { return new Date(1997,6,16,19,20,30).setTimezoneOffset('+0100').equals( Date.parseExact('1997-07-16T19:20:30+01:00', "yyyy-MM-ddTHH:mm:ssz") ) }
       },
-       '1997-07-16T19:20:30.45+01:00 : "YYYY-MM-DDThh:mm:ss.sTZD"': {
-        run: function() { },
-        assert: function() { return new Date(1997,6,16,19,20,30,45).setTimezoneOffset('+0100').equals( Date.parse('1997-07-16T19:20:30.45+01:00') ) }
-      }    
+  },
+  'Fail': {
+     '1997-07-16T19:20:30.45+01:00 : "YYYY-MM-DDThh:mm:ss.sTZD"': {
+      run: function() { },
+      assert: function() { return new Date(1997,6,16,19,20,30,45).setTimezoneOffset('+0100').equals( Date.parse('1997-07-16T19:20:30.45+01:00') ) }
+    }
   },
 
 'RFC 3339 Formats': {
