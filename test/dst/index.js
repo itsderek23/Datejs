@@ -17,4 +17,3 @@ Date.Specification = new Specification({
    
 });
 
-$(document).ready( function() { Date.Specification.validate().show() } );
