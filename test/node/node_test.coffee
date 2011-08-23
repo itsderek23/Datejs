@@ -3,7 +3,7 @@ path = require('path')
 
 root = path.normalize(path.join(__dirname, '../..'))
 
-files = [ 'globalization/en-US.js', 'core.js', 'extras.js', 'parser.js', 'sugarpak.js', 'time.js' ]
+files = [ 'globalization/en-US.js', 'core.js', 'sugarpak.js', 'parser.js' ]
 
 for filename in files
   data = fs.readFileSync path.join(root, 'src', filename), 'utf-8'
@@ -27,9 +27,12 @@ for testDirectory in testDirectories
 
     for testName, testBody of tests
       continue if testName == 'setup'
-      do (setupBlock, testName, testBody) ->
+      do (contextName, setupBlock, testName, testBody) ->
         group[testName] = (test) ->
           setupBlock.call(this)   if setupBlock
           testBody.run.call(this) if testBody.run
-          test.ok(testBody.assert.call(this), testBody.assert)
+          if contextName == 'Fail'
+            test.equal(false, testBody.assert.call(this), "\n      " + String(testBody.assert))
+          else
+            test.ok(testBody.assert.call(this), "\n      " + String(testBody.assert))
           test.done()
