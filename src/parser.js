@@ -634,10 +634,10 @@
                 today = new Date();
             }
             
-            var expression = !!(this.days && this.days !== null || this.orient || this.operator);
+            var expression = !!(this.days && this.days !== null || this.orient || this.operator || this.bias);
             
             var gap, mod, orient;
-            orient = ((this.orient == "past" || this.operator == "subtract") ? -1 : 1);
+            orient = ((this.orient == "past" || this.operator == "subtract" || this.bias == "past") ? -1 : 1);
             
             // For parsing: "last second", "next minute", "previous hour", "+5 seconds",
             //   "-5 hours", "5 hours", "7 hours ago"
@@ -679,7 +679,7 @@
 
             // For parsing: "last january", "prev march", "next july", "today + 1 month",
             //   "+5 months"
-            if (expression && (this.month || this.month === 0) && this.unit != "year") {
+            if ((expression && !this.bias) && (this.month || this.month === 0) && this.unit != "year") {
                 this.unit = "month";
                 gap = (this.month - today.getMonth());
                 mod = 12;
@@ -687,10 +687,10 @@
                 this.month = null;
             }
 
-            // For parsing: "Yesterday", "Tomorrow", "last monday", "last friday",
-            //   "previous day", "next week", "next month", "next year",
+            // For parsing: "last monday", "last friday", "previous day",
+            //   "next week", "next month", "next year",
             //   "today+", "+", "-", "yesterday at 4:00", "last friday at 20:00"
-            if (!this.value && expression) {
+            if (!this.value && expression && !this.bias) {
                 this.value = 1;
             }
 
@@ -700,9 +700,9 @@
             }
 
             // For parsing: "15th at 20:15", "15th at 8pm"
-            if (!expression && this.value && (!this.unit || this.unit == "day") && !this.day) {
+            if ((!expression || this.bias) && this.value && (!this.unit || this.unit == "day") && !this.day) {
               this.unit = "day";
-              this.day = this.value * orient;
+              this.day = this.value * 1
             }
 
             // For parsing: "last minute", "+5 hours", "previous month", "1 year ago tomorrow"
@@ -740,6 +740,28 @@
             }
             
             today.set(this);
+
+            if (this.bias) {
+              if (this.day) {
+                this.days = null
+              }
+
+              if (!this.day) {
+                if ((this.bias == "past" && today > new Date()) || (this.bias == "future" && today < new Date())) {
+                  this.days = 1 * orient
+                }
+              } else if (!this.month && !this.months) {
+                if ((this.bias == "past" && today > new Date()) || (this.bias == "future" && today < new Date())) {
+                  this.months = 1 * orient
+                }
+              } else if (!this.year) {
+                if ((this.bias == "past" && today > new Date()) || (this.bias == "future" && today < new Date())) {
+                  this.years = 1 * orient
+                }
+              }
+
+              expression = true;
+            }
 
             if (expression) {
               today.add(this);
@@ -1083,11 +1105,11 @@
         if (!o) {
           o = {}
         }
-        // try {
+        try {
             r = $D.Grammar.start.call({}, s.replace(/^\s*(\S*(\s+\S+)*)\s*$/, "$1"), o);
-        // } catch (e) {
-            // return null;
-        // }
+        } catch (e) {
+            return null;
+        }
         return ((r[1].length === 0) ? r[0] : null);
     };
 
