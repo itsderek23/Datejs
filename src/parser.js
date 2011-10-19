@@ -654,7 +654,7 @@
             }
             
             // For parsing: "monday @ 8pm", "12p on monday", "Friday"
-            if (!expression && this.weekday && !this.day && !this.days) {
+            if ((!expression || this.bias) && this.weekday && !this.day && !this.days) {
                 var temp = Date[this.weekday]();
                 this.day = temp.getDate();
                 if (!this.month) {
@@ -757,6 +757,11 @@
               } else if (!this.year) {
                 if ((this.bias == "past" && today > new Date()) || (this.bias == "future" && today < new Date())) {
                   this.years = 1 * orient
+                }
+              }
+							} else if (this.weekday) {
+                if ((this.bias == "past" && today > new Date()) || (this.bias == "future" && today < new Date())) {
+									this.days = 7 * orient;
                 }
               }
 
